@@ -84,3 +84,4 @@ services:
     - --enr-address=${PUBLIC_IP}
     - --slots-per-restore-point=${SPRP}
     - --historic-state-cache-size=${HSCS}
+    - --purge-db
