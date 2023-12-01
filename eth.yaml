@@ -42,14 +42,13 @@ services:
     - --txlookuplimit=0
     - --nat=extip:${PUBLIC_IP}
     - --maxpeers=300
-    - --mainnet
+    - --${NETWORK}
     - --syncmode=snap
     - --db.engine=leveldb
     - --metrics
     - --pprof
     - --pprof.addr=0.0.0.0
     - --pprof.port=6060
-
   lighthouse:
     image: '${LIGHTHOUSE_IMAGE}'
     pull_policy: always
@@ -69,7 +68,7 @@ services:
     command:
     - lighthouse
     - bn
-    - --network=mainnet
+    - --network=${NETWORK}
     - --datadir=/data
     - --execution-endpoint=http://geth:8551
     - --execution-jwt=/geth/jwt.hex
@@ -87,3 +86,22 @@ services:
     - --historic-state-cache-size=${HSCS}
     - --purge-db
     - --disable-backfill-rate-limiting
+    - --builder=http://mev-boost:18550
+  mev-boost: 
+    image: ${MEV_IMAGE}
+    pull_policy: always
+    container_name: mev-boost
+    restart: unless-stopped
+    stop_signal: SIGINT
+    stop_grace_period: 2m 
+    ports: 
+    - 18550:18550
+    command: 
+    - -${NETWORK}
+    - -relays
+    - ${MEV_RELAYS}
+    - -addr 
+    - 0.0.0.0:18550
+    - -logLevel
+    - info 
+    - -json
